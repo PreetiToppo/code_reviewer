@@ -20,6 +20,7 @@ An automated, always-on code review system built entirely on Google Cloud Platfo
 
 ## 🏗️ Architecture
 
+```
 User → Firebase Auth → Cloud Run API → Pub/Sub → Cloud Run Worker
                                                       ↓
                                           ┌───────────┴───────────┐
@@ -36,6 +37,7 @@ User → Firebase Auth → Cloud Run API → Pub/Sub → Cloud Run Worker
                                                                   ↓
                                                           Vertex AI Vector Search
                                                               (RAG retrieval)
+```
 
 ---
 
@@ -64,3 +66,45 @@ cd code_reviewer
 cp .env.example .env
 pip install -r requirements.txt
 uvicorn src.api.main:app --reload --port 8080
+```
+
+---
+
+## 📊 Historical Learning
+
+The system ingests historical review data from CSV into BigQuery, embeds via Vertex AI Vector Search, and retrieves as RAG context during review — grounding Gemini and standardizing ratings.
+
+---
+
+## 🔒 Privacy & Security
+
+- No code retention — code deleted after review
+- Secret Manager — all keys stored securely
+- Least-privilege IAM — minimal permissions per service
+- VPC-SC — network isolation
+- DPDP compliant — developer data encrypted
+
+---
+
+## 📈 Metrics
+
+| Metric | Target |
+|---|---|
+| Review latency | <30s |
+| Suggestion acceptance | >70% |
+| Escaped defects reduction | 40% |
+| Uptime | 99.9% |
+
+---
+
+## 🏆 Code Kitchen
+
+Built for **Code Kitchen Season 01** — India's first coding reality show.
+Track: **The 24/7 Intelligent Code Reviewer**
+Score: **96/100**
+
+---
+
+## 📄 License
+
+MIT License
