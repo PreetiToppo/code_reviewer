@@ -1,14 +1,20 @@
 """
 Gemini-powered code reviewer.
 
-Combines symbolic AST facts + RAG-retrieved historical rules to ground
-the LLM and reduce hallucination.
+Uses the current google-genai SDK. Combines symbolic AST facts +
+RAG-retrieved historical rules to ground the LLM and reduce
+hallucination. Falls back to a mock review when no API key is set.
 """
+import json
+import re
 from typing import Dict, List
+
 from src.utils.config import config
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
+MODEL_NAME = "gemini-2.5-flash"
 
 REVIEW_PROMPT = """You are an expert code reviewer.
 
@@ -23,7 +29,7 @@ Your job:
 - Assign a quality score from 1 to 10 (10 = production-ready)
 - Ground every claim in the facts or rules provided — do not invent issues
 
-Return your answer as JSON with keys:
+Return ONLY valid JSON with keys:
 summary (string), issues (list of objects with severity, type, line_hint, fix), quality_score (integer)
 
 --- SOURCE CODE ---
@@ -39,12 +45,16 @@ summary (string), issues (list of objects with severity, type, line_hint, fix), 
 
 class GeminiReviewer:
     def __init__(self):
-        self.enabled = bool(config.GEMINI_API_KEY)
+        self.enabled = bool(config.GEMINI_API_KEY) and not config.GEMINI_API_KEY.startswith("your-")
+        self.client = None
         if self.enabled:
-            import google.generativeai as genai
-            genai.configure(api_key=config.GEMINI_API_KEY)
-            self.model = genai.GenerativeModel("gemini-2.5-flash")
-        else:
+            try:
+                from google import genai
+                self.client = genai.Client(api_key=config.GEMINI_API_KEY)
+            except Exception as e:
+                logger.error(f"Gemini client init failed: {e}")
+                self.enabled = False
+        if not self.enabled:
             logger.warning("GEMINI_API_KEY not set — running in mock mode.")
 
     def review(self, code: str, ast_result: Dict, rules: List[str]) -> Dict:
@@ -58,9 +68,12 @@ class GeminiReviewer:
         )
 
         try:
-            response = self.model.generate_content(prompt)
-            text = response.text.strip()
-            import json, re
+            from google import genai
+            response = self.client.models.generate_content(
+                model=MODEL_NAME,
+                contents=prompt,
+            )
+            text = (response.text or "").strip()
             text = re.sub(r"^```json|```$", "", text, flags=re.MULTILINE).strip()
             return json.loads(text)
         except Exception as e:
