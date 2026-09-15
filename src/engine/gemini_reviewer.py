@@ -14,7 +14,7 @@ from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-MODEL_NAME = "gemini-3.6-flash"
+MODEL_NAME = "gemini-3.8-flash"
 
 REVIEW_PROMPT = """You are an expert code reviewer.
 
