@@ -31,6 +31,22 @@ def test_handles_syntax_error_gracefully():
     result = parser.parse(code, "python")
     assert "error" in result
 
+def test_javascript_parsing():
+    parser = ASTParser()
+    js = "function add(a, b) {\n  var x = a + b;\n  console.log(x);\n  return x;\n}"
+    result = parser.parse(js, "javascript")
+    facts = result["facts"]
+    assert any("var" in f for f in facts)
+    assert any("console.log" in f for f in facts)
+
+
+def test_typescript_parsing():
+    parser = ASTParser()
+    ts = "function f(x: any) { return x; }"
+    result = parser.parse(ts, "typescript")
+    facts = result["facts"]
+    assert any("any" in f for f in facts)
+
 
 def test_returns_line_count():
     code = "x = 1\ny = 2\nz = 3"
