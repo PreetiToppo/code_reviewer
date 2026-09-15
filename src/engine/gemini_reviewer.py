@@ -24,7 +24,7 @@ Your job:
 - Ground every claim in the facts or rules provided — do not invent issues
 
 Return your answer as JSON with keys:
-{ "summary": str, "issues": [{"severity": str, "type": str, "line_hint": str, "fix": str}], "quality_score": int }
+summary (string), issues (list of objects with severity, type, line_hint, fix), quality_score (integer)
 
 --- SOURCE CODE ---
 {code}
@@ -61,7 +61,6 @@ class GeminiReviewer:
             response = self.model.generate_content(prompt)
             text = response.text.strip()
             import json, re
-            # Strip code fences if present
             text = re.sub(r"^```json|```$", "", text, flags=re.MULTILINE).strip()
             return json.loads(text)
         except Exception as e:
