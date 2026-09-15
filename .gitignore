@@ -23,6 +23,8 @@ service-account-key.json
 .DS_Store
 Thumbs.db
 
+data/local_sessions.json
+
 # Build
 dist/
 build/
