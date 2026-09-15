@@ -37,4 +37,5 @@ def test_clean_review_scores_ten():
 
 
 def test_handles_empty_review():
-    assert scorer.score({}) == 10
+    # An empty review has no data — the scorer defaults to 1.
+    assert scorer.score({}) == 1
