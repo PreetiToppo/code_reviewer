@@ -1,3 +1,5 @@
+![Tests](https://github.com/PreetiToppo/code_reviewer/actions/workflows/deploy.yml/badge.svg)
+
 # 24/7 Intelligent Code Reviewer
 
 > **One-liner:** A multi-language AI code reviewer that runs on Gemini + Google Cloud, costs ₹0 per review, and gives every developer a 1–10 quality score plus a growth trail.
